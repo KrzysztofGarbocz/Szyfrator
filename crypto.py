@@ -1,21 +1,15 @@
-from abc import ABC
 import base64
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 
 
-class Execute(ABC):
-    def execute(self, password):
-        pass
-
-
-class EncryptDecrypt(Execute):
-    def execute(self, password):
-        pass
+class EncryptDecrypt:
 
     def __init__(self, path):
         self.path = path
+
+    verbosity = None
 
     @staticmethod
     def create_key(password):

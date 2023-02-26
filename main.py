@@ -19,7 +19,7 @@ def invalid_name(value: str):
 
 
 class Password(argparse.Action):
-    def __call__(self, parser, ArgumentParser, namespace: Namespace, values: Any, option_string)->None:
+    def __call__(self, parser: ArgumentParser, namespace: Namespace, values: Any, option_string) -> None:
         if values is None:
             values = getpass.getpass()
             setattr(namespace, self.dest, values)
@@ -42,8 +42,13 @@ def main(args):
             to_file_process = args.file
         else:
             raise argparse.ArgumentError()
-        if args.verbose > 2:
+
+        if args.verbose > 2 and args.file:
             to_file_process = tqdm(args.file)
+
+        if args.verbose > 2 and args.dir:
+            to_file_process = tqdm(list_file_to_process(args.dir))
+
         for file in to_file_process:
             before = time()
             path = pathlib.Path(file)
@@ -52,11 +57,11 @@ def main(args):
             elif args.mode == 'decrypt':
                 action = Decryption(path)
             elif args.mode == 'append':
-                text = input('Co dopisać do pliku? ')
+                text = input(' What you need to append? ')
                 action = Append(path, text)
 
             action.verbosity = args.verbose
-            action.execute(args.password)
+            action.execute(str(args.password))
             after = time()
 
             if 3 > args.verbose > 0:
@@ -68,10 +73,11 @@ def main(args):
             if args.verbose > 2:
                 to_file_process.set_description(file)
 
+
     except InvalidToken:
-        print('Niepoprawne hasło!')
+        print('Wrong password!')
     except ArgumentError:
-        print("Nie podano pliku ani dir")
+        print("Not define file or directory")
 
 
 if __name__ == '__main__':
